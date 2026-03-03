@@ -1,0 +1,13 @@
+from mcr.microsoft.com/dotnet/sdk:8.0 as build
+workdir /src
+
+copy src/Presentation/TelegramBot/Flowist.TelegramBot/Flowist.TelegramBot.csproj ./
+run dotnet restore
+
+copy src/Presentation/TelegramBot/Flowist.TelegramBot/ ./
+run dotnet publish -c Release -o /app/publish
+
+from mcr.microsoft.com/dotnet/aspnet:8.0
+workdir /app
+copy --from=build /app/publish .
+entrypoint ["dotnet", "Flowist.TelegramBot.dll"]

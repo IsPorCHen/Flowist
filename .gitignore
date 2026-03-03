@@ -1,1 +1,14 @@
+# environment
 .env
+*.env
+!.env.example
+
+# ide
+.vs/
+.vscode/
+*.user
+*.suo
+
+# build
+bin/
+obj/
