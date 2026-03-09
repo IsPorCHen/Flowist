@@ -1,28 +1,40 @@
-﻿// using Telegram.Bot;
-// using Telegram.Bot.Types;
-// using Telegram.Bot.Types.Enums;
+﻿using Flowist.Infrastructure.Config;
+using Flowist.Infrastructure.Logging;
+using Flowist.TelegramBot.Handlers;
+using Flowlist.Core.Interfaces;
+using Flowist.Presentation.TelegramBot.Services;
 
-// var token = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-// if (string.IsNullOrEmpty(token))
-// {
-//     Console.WriteLine("Token will not find");
-// }
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
-// using var cts = new CancellationTokenSource();
-// var bot = new TelegramBotClient(token, cancellationToken: cts.Token);
-// var me = await bot.GetMe();
-// bot.OnMessage += OnMessage;
+namespace Flowist.TelegramBot;
 
-// Console.WriteLine($"@{me.Username} is running.");
-// await Task.Delay(-1, cts.Token);
+public class Program
+{
+    public static async Task Main(string[] args)
+    {
+        var host = CreateHostBuilder(args).Build();
+        await host.RunAsync();
+    }
 
-// // method that handle messages received by the bot:
-// async Task OnMessage(Message msg, UpdateType type)
-// {
-//     if (msg.Text is null) return;	// we only handle Text messages here
-//     Console.WriteLine($"Received {type} '{msg.Text}' in {msg.Chat}");
-//     // let's echo back received text in the chat
-//     await bot.SendMessage(msg.Chat, $"{msg.From} said: {msg.Text}");
-    
-// }
+    private static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureServices((context, services) =>
+            {
+                // Configure Telegram Bot Client
+                services.AddSingleton<IBotConfig, EnvBotConfig>();
+
+                // Logging
+                services.AddSingleton<IAppLogger, ConsoleLogger>();
+
+                // Handlers
+                services.AddSingleton<IMessageHandler, EchoMessageHandler>();
+
+                // Bot Service
+                services.AddHostedService<TelegramBotService>();
+            });
+}

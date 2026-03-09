@@ -1,4 +1,4 @@
-using Flowist.Core.Interfaces;
+using Flowlist.Core.Interfaces;
 
 namespace Flowist.Infrastructure.Logging;
 
