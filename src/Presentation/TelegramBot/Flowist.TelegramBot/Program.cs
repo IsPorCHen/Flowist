@@ -24,6 +24,5 @@
 //     Console.WriteLine($"Received {type} '{msg.Text}' in {msg.Chat}");
 //     // let's echo back received text in the chat
 //     await bot.SendMessage(msg.Chat, $"{msg.From} said: {msg.Text}");
-//     Console.WriteLine("Hello world!");
     
 // }

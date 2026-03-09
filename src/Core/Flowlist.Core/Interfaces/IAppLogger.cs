@@ -1,4 +1,4 @@
-namespace Flowist.Core.Interfaces;
+namespace Flowlist.Core.Interfaces;
 
 public interface IAppLogger
 {

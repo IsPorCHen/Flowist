@@ -1,4 +1,4 @@
-namespace Flowist.Core.Models;
+namespace Flowlist.Core.Models;
 
 public class Message
 {

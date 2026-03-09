@@ -1,10 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <!-- temporarily remove links
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Flowlist.Core\Flowlist.Core.csproj" />
     <ProjectReference Include="..\..\..\Infrastructure\Flowist.Infrastructure\Flowist.Infrastructure.csproj" />
-  </ItemGroup> -->
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.3" />

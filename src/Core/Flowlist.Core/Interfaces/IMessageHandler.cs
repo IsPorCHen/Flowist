@@ -1,6 +1,6 @@
-using Flowist.Core.Models;
+using Flowlist.Core.Models;
 
-namespace Flowist.Core.Interfaces;
+namespace Flowlist.Core.Interfaces;
 
 public interface IMessageHandler
 {
