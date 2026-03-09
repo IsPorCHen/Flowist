@@ -4,6 +4,6 @@ namespace Flowist.Infrastructure.Config;
 
 public class EnvBotConfig: IBotConfig
 {
-    public string TelegramToken => Environment.GetEnvironmentVariable("TELEGRAM BOT TOKEN")
+    public string TelegramToken => Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN")
         ?? throw new InvalidOperationException("Telegram bot token is not set in environment variables.");
 }

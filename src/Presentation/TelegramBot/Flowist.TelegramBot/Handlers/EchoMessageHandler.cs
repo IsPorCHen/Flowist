@@ -10,9 +10,9 @@ public class EchoMessageHandler : IMessageHandler
         _logger = logger;
     }
 
-    public Task<string> HandleMessageAsync(string messageText, string username, long ChatId)
+    public async Task<string> HandleMessageAsync(string messageText, string username, long ChatId)
     {
-        _logger.LogInfo("Received message: {Message} from chat: {ChatId}", messageText, ChatId);
-        return Task.FromResult($"Echo: {messageText}");
+        _logger.LogInfo("Received message: {0} from chat: {1}", messageText, ChatId);
+        return await Task.FromResult($"Echo: {messageText}");
     }
 }
