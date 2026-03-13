@@ -1,18 +1,14 @@
 using Flowlist.Core.Interfaces;
+using Flowlist.Core.Logger;
 
 namespace Flowist.TelegramBot.Handlers;
 
-public class EchoMessageHandler : IMessageHandler
+public class EchoMessageHandler(IConsoleLogger logger) : IMessageHandler
 {
-    private readonly IAppLogger _logger;
-    public EchoMessageHandler(IAppLogger logger)
+    public async Task<string> HandleMessageAsync(string messageText, string username, long chatId)
     {
-        _logger = logger;
-    }
+        logger.LogTrace("Received message: {0} from chat: {1}", messageText, chatId);
 
-    public async Task<string> HandleMessageAsync(string messageText, string username, long ChatId)
-    {
-        _logger.LogInfo("Received message: {0} from chat: {1}", messageText, ChatId);
         return await Task.FromResult($"Echo: {messageText}");
     }
 }

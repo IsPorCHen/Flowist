@@ -1,40 +1,42 @@
-﻿using Flowist.Infrastructure.Config;
-using Flowist.Infrastructure.Logging;
+﻿using Flowist.Presentation.TelegramBot.Services;
 using Flowist.TelegramBot.Handlers;
+using Flowist.TelegramBot.Options;
+using Flowlist.Core.Dependencies;
 using Flowlist.Core.Interfaces;
-using Flowist.Presentation.TelegramBot.Services;
-
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureAppConfiguration(
+        (context, config) =>
+        {
+            config
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.creds.json", optional: true, reloadOnChange: true);
+        }
+    )
+    .ConfigureServices(
+        (context, services) =>
+        {
+            services.AddConsoleLogger();
 
-namespace Flowist.TelegramBot;
+            services
+                .AddOptions<TelegramOptions>()
+                .Bind(context.Configuration.GetSection("Telegram"))
+                .Validate(
+                    options => !string.IsNullOrWhiteSpace(options.Token),
+                    "Telegram:Token must be configured"
+                )
+                .ValidateOnStart();
 
-public class Program
-{
-    public static async Task Main(string[] args)
-    {
-        var host = CreateHostBuilder(args).Build();
-        await host.RunAsync();
-    }
+            // Handlers
+            services.AddSingleton<IMessageHandler, EchoMessageHandler>();
 
-    private static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureServices((context, services) =>
-            {
-                // Configure Telegram Bot Client
-                services.AddSingleton<IBotConfig, EnvBotConfig>();
+            // Bot Service
+            services.AddHostedService<TelegramBotService>();
+        }
+    )
+    .Build();
 
-                // Logging
-                services.AddSingleton<IAppLogger, ConsoleLogger>();
-
-                // Handlers
-                services.AddSingleton<IMessageHandler, EchoMessageHandler>();
-
-                // Bot Service
-                services.AddHostedService<TelegramBotService>();
-            });
-}
+await host.RunAsync();

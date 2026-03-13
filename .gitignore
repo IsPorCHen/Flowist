@@ -12,3 +12,6 @@
 # build
 bin/
 obj/
+
+# appsettings
+appsettings.creds.json
