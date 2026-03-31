@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY src/Core/Flowlist.Core/Flowlist.Core.csproj Core/Flowlist.Core/
+COPY src/Infrastructure/Flowist.Infrastructure/Flowist.Infrastructure.csproj Infrastructure/Flowist.Infrastructure/
+COPY src/Presentation/ApiGateway/Flowist.ApiGateway/Flowist.ApiGateway.csproj Presentation/ApiGateway/Flowist.ApiGateway/
+
+RUN dotnet restore Presentation/ApiGateway/Flowist.ApiGateway/Flowist.ApiGateway.csproj
+
+COPY src/ .
+
+WORKDIR /src/Presentation/ApiGateway/Flowist.ApiGateway
+RUN dotnet publish -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Flowist.ApiGateway.dll"]
