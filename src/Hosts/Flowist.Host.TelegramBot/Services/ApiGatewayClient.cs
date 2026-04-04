@@ -1,16 +1,17 @@
+using System.Net.Http.Json;
+using Flowist.TelegramBot.Options;
 using Flowlist.Core.Contracts;
 using Flowlist.Core.Interfaces;
-using Flowist.TelegramBot.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Net.Http.Json;
 
 namespace Flowist.TelegramBot.Services;
 
 public class ApiGatewayClient(
     IHttpClientFactory httpClientFactory,
     IOptions<GatewayOptions> options,
-    ILogger<ApiGatewayClient> logger) : IApiGatewayClient
+    ILogger<ApiGatewayClient> logger
+) : IApiGatewayClient
 {
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient("ApiGateway");
     private readonly string _gatewayUrl = options.Value.BaseUrl;
@@ -22,9 +23,10 @@ public class ApiGatewayClient(
         try
         {
             var response = await _httpClient.PostAsJsonAsync(
-                $"{_gatewayUrl}/api/messages",
+                $"{_gatewayUrl}/ask",
                 message,
-                cancellationToken);
+                cancellationToken
+            );
 
             if (response.IsSuccessStatusCode)
             {
@@ -33,7 +35,10 @@ public class ApiGatewayClient(
             }
             else
             {
-                logger.LogWarning("Failed to send message. Status: {StatusCode}", response.StatusCode);
+                logger.LogWarning(
+                    "Failed to send message. Status: {StatusCode}",
+                    response.StatusCode
+                );
             }
         }
         catch (Exception ex)

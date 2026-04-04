@@ -1,20 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
     <PackageReference Include="Ocelot" Version="24.1.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.13.19" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.6" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\Flowlist.Core\Flowlist.Core.csproj" />
-    <ProjectReference Include="..\..\..\Infrastructure\Flowist.Infrastructure\Flowist.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Flowlist.Core\Flowlist.Core.csproj" />
+    <ProjectReference Include="..\..\Flowlist.Infrastructure\Flowlist.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>

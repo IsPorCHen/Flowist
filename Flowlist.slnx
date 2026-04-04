@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Flowlist.Core/Flowlist.Core.csproj" />
+    <Project Path="src/Flowlist.Infrastructure/Flowlist.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Hosts/">
+    <Project Path="src/Hosts/Flowist.Host.ApiGateway/Flowist.Host.ApiGateway.csproj" />
+    <Project Path="src/Hosts/Flowist.Host.TelegramBot/Flowist.Host.TelegramBot.csproj" />
+  </Folder>
+</Solution>

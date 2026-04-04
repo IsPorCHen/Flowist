@@ -11,5 +11,5 @@ public record Message
 public enum MessageStatusCases
 {
     Created,
-    Updated
+    Updated,
 }

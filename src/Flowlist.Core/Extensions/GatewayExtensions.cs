@@ -22,7 +22,7 @@ public static class GatewayExtensions
     }
 
     // GET request deserialize
-    public static async Task<T?> GetAsync<T> (
+    public static async Task<T?> GetAsync<T>(
         this IGateway gateway,
         string path,
         CancellationToken cancellationToken = default) where T : class
@@ -31,7 +31,7 @@ public static class GatewayExtensions
 
         if (!response.IsSuccessStatusCode)
             return null;
-        
+
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         return JsonSerializer.Deserialize<T>(json, _jsonOptions);
     }
@@ -60,7 +60,7 @@ public static class GatewayExtensions
         var json = JsonSerializer.Serialize(data);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         return await gateway.PostAsync(path, content, cancellationToken);
-    } 
+    }
 
     // POST with JSON & answer
     public static async Task<TResponse?> PostJsonAsync<TRequest, TResponse>(
@@ -75,7 +75,7 @@ public static class GatewayExtensions
 
         if (!response.IsSuccessStatusCode)
             return null;
-        
+
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         return JsonSerializer.Deserialize<TResponse>(json, _jsonOptions);
     }

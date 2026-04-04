@@ -1,5 +1,4 @@
 using Flowist.TelegramBot.Options;
-using Flowlist.Core.Contracts;
 using Flowlist.Core.Interfaces;
 using Flowlist.Core.Logger;
 using Microsoft.Extensions.Hosting;
