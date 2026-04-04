@@ -6,4 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks" Version="1.0.0" />
+    <PackageReference Include="Ocelot" Version="24.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Flowlist.Core\Flowlist.Core.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructure\Flowist.Infrastructure\Flowist.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
