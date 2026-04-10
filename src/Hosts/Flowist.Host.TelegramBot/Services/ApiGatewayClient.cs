@@ -30,15 +30,11 @@ public class ApiGatewayClient(
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<object>(cancellationToken);
-                logger.LogTrace("Message sent successfully: {Result}", result);
+                logger.LogTrace("Message sent successfully");
             }
             else
             {
-                logger.LogWarning(
-                    "Failed to send message. Status: {StatusCode}",
-                    response.StatusCode
-                );
+                logger.LogWarning("Failed to send message. Status: {StatusCode}", response.StatusCode);
             }
         }
         catch (Exception ex)

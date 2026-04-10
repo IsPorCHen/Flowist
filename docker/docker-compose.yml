@@ -10,7 +10,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
     volumes:
-      - ../src/Presentation/ApiGateway/Flowist.ApiGateway/appsettings.creds.json:/app/appsettings.creds.json:ro
+      - ../src/Hosts/Flowist.Host.ApiGateway/appsettings.creds.json:/app/appsettings.creds.json:ro
     restart: unless-stopped
     networks:
       - flowist-network
@@ -23,7 +23,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
-      - ../src/Presentation/TelegramBot/Flowist.TelegramBot/appsettings.creds.json:/app/appsettings.creds.json:ro
+      - ../src/Hosts/Flowist.Host.TelegramBot/appsettings.creds.json:/app/appsettings.creds.json:ro
     depends_on:
       - api-gateway
     restart: unless-stopped

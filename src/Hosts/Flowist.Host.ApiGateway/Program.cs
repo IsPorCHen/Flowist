@@ -1,40 +1,41 @@
 using Flowlist.Core.Contracts;
-using Flowlist.Core.Logger;
 using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .Enrich.WithProperty("Timestamp", DateTime.UtcNow)
+    // todo: add file sink with rolling interval
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}" // write to file again
+    )
+    .CreateLogger();
 
-builder.Services.AddScoped<IConsoleLogger, DefaultConsoleLogger>();
-builder.Services.AddOpenApi();
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
 
-var app = builder.Build();
+    builder.Configuration.AddJsonFile("appsettings.creds.json", optional: true, reloadOnChange: true);
 
-app.MapOpenApi();
-app.MapScalarApiReference();
+    builder.Logging.ClearProviders();
+    builder.Logging.AddSerilog();
 
-app.MapPost(
-    "/ask",
-    async ([FromBody] Message message, IConsoleLogger logger) =>
-    {
-        logger.LogInfo(
-            string.Format(
-                "Received message from user {0} in chat {1}: {2}",
-                message.UserId,
-                message.ChatId,
-                message.Text
-            )
-        );
-        return Results.Accepted(
-            value: new
-            {
-                messageId = Guid.NewGuid(),
-                status = "accepted",
-                receivedAt = DateTime.UtcNow,
-                text = message.Text,
-            }
-        );
-    }
-);
+    builder.Services.AddOpenApi();
+    builder.Services.AddScoped<ApiKeyFilter>();
 
-await app.RunAsync();
+    var app = builder.Build();
+
+    app.UseMiddleware<RequestResponseLoggingMiddleware>();
+
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+
+    app.MapAskEndpoint();
+
+    await app.RunAsync();
+}
+finally
+{
+    Log.CloseAndFlush();
+}

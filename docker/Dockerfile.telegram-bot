@@ -1,18 +1,18 @@
-from mcr.microsoft.com/dotnet/sdk:8.0 as build
-workdir /src
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
 
-copy src/Core/Flowlist.Core/Flowlist.Core.csproj Core/Flowlist.Core/
-copy src/Infrastructure/Flowist.Infrastructure/Flowist.Infrastructure.csproj Infrastructure/Flowist.Infrastructure/
-copy src/Presentation/TelegramBot/Flowist.TelegramBot/Flowist.TelegramBot.csproj Presentation/TelegramBot/Flowist.TelegramBot/
+COPY src/Flowlist.Core/Flowlist.Core.csproj Flowlist.Core/
+COPY src/Flowlist.Infrastructure/Flowlist.Infrastructure.csproj Flowlist.Infrastructure/
+COPY src/Hosts/Flowist.Host.TelegramBot/Flowist.Host.TelegramBot.csproj Hosts/Flowist.Host.TelegramBot/
 
-run dotnet restore Presentation/TelegramBot/Flowist.TelegramBot/Flowist.TelegramBot.csproj
+RUN dotnet restore Hosts/Flowist.Host.TelegramBot/Flowist.Host.TelegramBot.csproj
 
-copy src/ .
+COPY src/ .
 
-workdir /src/Presentation/TelegramBot/Flowist.TelegramBot
-run dotnet publish -c Release -o /app/publish
+WORKDIR /src/Hosts/Flowist.Host.TelegramBot
+RUN dotnet publish -c Release -o /app/publish
 
-from mcr.microsoft.com/dotnet/aspnet:8.0
-workdir /app
-copy --from=build /app/publish .
-entrypoint ["dotnet", "Flowist.TelegramBot.dll"]
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Flowist.Host.TelegramBot.dll"]

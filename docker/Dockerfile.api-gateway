@@ -1,18 +1,18 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY src/Core/Flowlist.Core/Flowlist.Core.csproj Core/Flowlist.Core/
-COPY src/Infrastructure/Flowist.Infrastructure/Flowist.Infrastructure.csproj Infrastructure/Flowist.Infrastructure/
-COPY src/Presentation/ApiGateway/Flowist.ApiGateway/Flowist.ApiGateway.csproj Presentation/ApiGateway/Flowist.ApiGateway/
+COPY src/Flowlist.Core/Flowlist.Core.csproj Flowlist.Core/
+COPY src/Flowlist.Infrastructure/Flowlist.Infrastructure.csproj Flowlist.Infrastructure/
+COPY src/Hosts/Flowist.Host.ApiGateway/Flowist.Host.ApiGateway.csproj Hosts/Flowist.Host.ApiGateway/
 
-RUN dotnet restore Presentation/ApiGateway/Flowist.ApiGateway/Flowist.ApiGateway.csproj
+RUN dotnet restore Hosts/Flowist.Host.ApiGateway/Flowist.Host.ApiGateway.csproj
 
 COPY src/ .
 
-WORKDIR /src/Presentation/ApiGateway/Flowist.ApiGateway
+WORKDIR /src/Hosts/Flowist.Host.ApiGateway
 RUN dotnet publish -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "Flowist.ApiGateway.dll"]
+ENTRYPOINT ["dotnet", "Flowist.Host.ApiGateway.dll"]

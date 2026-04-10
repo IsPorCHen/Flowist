@@ -4,46 +4,63 @@ using Flowist.TelegramBot.Services;
 using Flowist.Presentation.TelegramBot.Services;
 using Flowlist.Core.Dependencies;
 using Flowlist.Core.Interfaces;
-using Flowlist.Core.Logger;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 
-var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((context, config) =>
-    {
-        config
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true)
-            .AddJsonFile("appsettings.creds.json", optional: true, reloadOnChange: true);
-    })
-    .ConfigureServices((context, services) =>
-    {
-        services.AddConsoleLogger();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+    )
+    .CreateLogger();
 
-        services.AddOptions<TelegramOptions>()
-            .Bind(context.Configuration.GetSection("Telegram"))
-            .Validate(options => !string.IsNullOrWhiteSpace(options.Token), "Token required")
-            .ValidateOnStart();
-
-        services.AddOptions<GatewayOptions>()
-            .Bind(context.Configuration.GetSection(GatewayOptions.SectionName))
-            .ValidateOnStart();
-
-        services.AddHttpClient("ApiGateway", (sp, client) =>
+try
+{
+    var builder = Host.CreateDefaultBuilder(args)
+        .ConfigureAppConfiguration((context, config) =>
         {
-            var options = sp.GetRequiredService<IOptions<GatewayOptions>>().Value;
-            client.BaseAddress = new Uri(options.BaseUrl);
-            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
-        });
+            config
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true)
+                .AddJsonFile("appsettings.creds.json", optional: true, reloadOnChange: true);
+        })
+        .ConfigureServices((context, services) =>
+        {
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.ClearProviders();
+                loggingBuilder.AddSerilog();
+            });
 
-        services.AddScoped<IApiGatewayClient, ApiGatewayClient>();
+            services.AddOptions<TelegramOptions>()
+                .Bind(context.Configuration.GetSection("Telegram"))
+                .Validate(options => !string.IsNullOrWhiteSpace(options.Token), "Token required")
+                .ValidateOnStart();
 
-        services.AddScoped<IMessageHandler, EchoMessageHandler>();
+            services.AddOptions<GatewayOptions>()
+                .Bind(context.Configuration.GetSection(GatewayOptions.SectionName))
+                .ValidateOnStart();
 
-        services.AddHostedService<TelegramBotService>();
-    })
-    .Build();
+            services.AddHttpClient("ApiGateway", (sp, client) =>
+            {
+                var options = sp.GetRequiredService<IOptions<GatewayOptions>>().Value;
+                client.BaseAddress = new Uri(options.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+            });
 
-await builder.RunAsync();
+            services.AddScoped<IApiGatewayClient, ApiGatewayClient>();
+            services.AddScoped<IMessageHandler, EchoMessageHandler>();
+            services.AddHostedService<TelegramBotService>();
+        })
+        .Build();
+
+    await builder.RunAsync();
+}
+finally
+{
+    Log.CloseAndFlush();
+}

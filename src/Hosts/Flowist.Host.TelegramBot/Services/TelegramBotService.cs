@@ -1,8 +1,8 @@
 using Flowist.TelegramBot.Options;
 using Flowlist.Core.Interfaces;
-using Flowlist.Core.Logger;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -13,31 +13,29 @@ namespace Flowist.Presentation.TelegramBot.Services;
 public class TelegramBotService : BackgroundService
 {
     private readonly ITelegramBotClient _botClient;
-    private readonly IConsoleLogger _logger;
+    private readonly ILogger<TelegramBotService> _logger;
     private readonly IMessageHandler _messageHandler;
     private readonly ReceiverOptions _receiverOptions;
 
     public TelegramBotService(
         IOptions<TelegramOptions> options,
-        IConsoleLogger logger,
+        ILogger<TelegramBotService> logger,
         IMessageHandler messageHandler
     )
     {
         _botClient = new TelegramBotClient(options.Value.Token);
-        logger.LogTrace("TelegramBotService initialized with token: {0}", options.Value.Token);
-
         _logger = logger;
         _messageHandler = messageHandler;
         _receiverOptions = new ReceiverOptions
         {
-            AllowedUpdates = [UpdateType.Message], // receive all update types
+            AllowedUpdates = [UpdateType.Message],
         };
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var me = await _botClient.GetMeAsync(stoppingToken);
-        _logger.LogTrace($"Bot {me.Username} started.");
+        _logger.LogTrace("Bot {Username} started.", me.Username);
 
         _botClient.StartReceiving(
             updateHandler: HandleUpdateAsync,
@@ -55,12 +53,12 @@ public class TelegramBotService : BackgroundService
         CancellationToken cancellationToken
     )
     {
-        _logger.LogTrace($"=== {nameof(HandleUpdateAsync)} called ===");
+        _logger.LogTrace("=== {MethodName} called ===", nameof(HandleUpdateAsync));
 
         if (update.Message is not { } message)
             return;
 
-        _logger.LogInfo($"Received message from {message.From?.Username}: {message.Text}");
+        _logger.LogInformation("Received message from {Username}: {Text}", message.From?.Username, message.Text);
 
         var responseText = await _messageHandler.HandleMessageAsync(
             message.Text ?? string.Empty,
@@ -68,7 +66,7 @@ public class TelegramBotService : BackgroundService
             message.Chat.Id
         );
 
-        _logger.LogInfo($"Sending response to {message.From?.Username}: {responseText}");
+        _logger.LogInformation("Sending response to {Username}: {Response}", message.From?.Username, responseText);
 
         await botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
@@ -76,9 +74,8 @@ public class TelegramBotService : BackgroundService
             cancellationToken: cancellationToken
         );
 
-        _logger.LogTrace($"Response sent to {message.From?.Username}");
-
-        _logger.LogTrace($"=== {nameof(HandleUpdateAsync)} finished ===");
+        _logger.LogTrace("Response sent to {Username}", message.From?.Username);
+        _logger.LogTrace("=== {MethodName} finished ===", nameof(HandleUpdateAsync));
     }
 
     private Task HandlePollingErrorAsync(
@@ -87,7 +84,7 @@ public class TelegramBotService : BackgroundService
         CancellationToken cancellationToken
     )
     {
-        _logger.LogError(exception, "Polling error: {0}", exception.Message);
+        _logger.LogError(exception, "Polling error: {Message}", exception.Message);
         return Task.CompletedTask;
     }
 }
