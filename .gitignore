@@ -8,6 +8,7 @@
 .vscode/
 *.user
 *.suo
+*.lscache
 
 # build
 bin/
